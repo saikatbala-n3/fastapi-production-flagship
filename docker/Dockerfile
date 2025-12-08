@@ -9,8 +9,10 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY requirements.txt ./
-RUN pip install -r requirements.txt
+COPY pyproject.toml poetry.lock* ./
+RUN pip install poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-interaction --no-ansi --no-root
 
 # Copy application
 COPY . .
