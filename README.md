@@ -36,29 +36,28 @@ A production-ready FastAPI template with async SQLAlchemy 2.0, Redis caching, JW
 - Type hints throughout
 
 ## Architecture
-        ┌─────────────┐
-        │   Client    │
-        └──────┬──────┘
-               │
-               ↓
-┌─────────────────────────────────┐
-│   Rate Limit Middleware         │
-│   Logging Middleware            │
-└─────────────┬───────────────────┘
-              │
-              ↓
-┌─────────────────────────────────┐
-│        FastAPI Router           │
-│   ┌──────────┬──────────────┐   │
-│   │   Auth   │    Users     │   │
-│   └──────────┴──────────────┘   │
-└──────────┬─────────────┬────────┘
-           │             │
-    ┌──────↓─────┐   ┌───↓────┐
-    │ PostgreSQL │   │ Redis  │
-    │  (Async)   │   │ Cache  │
-    └────────────┘   └────────┘
-
+            ┌─────────────┐
+            │   Client    │
+            └──────┬──────┘
+                   │
+                   ↓
+    ┌─────────────────────────────────┐
+    │   Rate Limit Middleware         │
+    │   Logging Middleware            │
+    └─────────────┬───────────────────┘
+                  │
+                  ↓
+    ┌─────────────────────────────────┐
+    │        FastAPI Router           │
+    │   ┌──────────┬──────────────┐   │
+    │   │   Auth   │    Users     │   │
+    │   └──────────┴──────────────┘   │
+    └──────────┬─────────────┬────────┘
+               │             │
+        ┌──────↓─────┐   ┌───↓────┐
+        │ PostgreSQL │   │ Redis  │
+        │  (Async)   │   │ Cache  │
+        └────────────┘   └────────┘
 ## Quick Start
 
 ### Prerequisites
