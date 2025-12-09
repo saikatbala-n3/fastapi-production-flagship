@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.cache import CacheManager, get_cache
 from app.core.database import get_db
-from app.core.cache import get_cache, CacheManager
 
 router = APIRouter()
 

@@ -1,11 +1,12 @@
-from typing import Optional, List
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from typing import List, Optional
 
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.cache import CacheManager
+from app.core.security import get_password_hash
 from app.models.user import User
 from app.schemas.user import UserUpdate
-from app.core.security import get_password_hash
-from app.core.cache import CacheManager
 
 
 class UserService:
@@ -82,9 +83,7 @@ class UserService:
         return True
 
     @staticmethod
-    async def get_users(
-        db: AsyncSession, skip: int = 0, limit: int = 100
-    ) -> List[User]:
+    async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100) -> List[User]:
         """
         Get list of users with pagination.
 
@@ -128,9 +127,7 @@ class UserService:
         update_data = user_update.model_dump(exclude_unset=True)
 
         if "password" in update_data:
-            update_data["hashed_password"] = get_password_hash(
-                update_data.pop("password")
-            )
+            update_data["hashed_password"] = get_password_hash(update_data.pop("password"))
 
         for field, value in update_data.items():
             setattr(user, field, value)

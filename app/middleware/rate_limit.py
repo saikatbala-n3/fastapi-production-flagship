@@ -1,6 +1,8 @@
 import time
-from fastapi import Request, HTTPException, status
+
+from fastapi import HTTPException, Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
+
 from app.core.cache import cache
 from app.core.config import settings
 
@@ -41,7 +43,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             last_refill = bucket_data["last_refill"]
 
             time_passed = current_time - last_refill
-            tokens = min(capacity, tokens + time_passed * refill_rate)
+            tokens = min(capacity, int(tokens + time_passed * refill_rate))
 
             if tokens < 1:
                 raise HTTPException(

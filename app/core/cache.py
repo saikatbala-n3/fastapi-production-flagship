@@ -1,6 +1,8 @@
-from typing import Optional, Any
 import json
+from typing import Any, Optional
+
 from redis.asyncio import Redis
+
 from app.core.config import settings
 
 

@@ -1,20 +1,18 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import decode_token
-from app.schemas.user import UserCreate, UserResponse, LoginRequest
-from app.schemas.token import Token
-from app.services.auth_service import AuthService
 from app.models.user import User
+from app.schemas.token import Token
+from app.schemas.user import LoginRequest, UserCreate, UserResponse
+from app.services.auth_service import AuthService
 
 router = APIRouter()
 
 
-@router.post(
-    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     """
     Register a new user.
@@ -61,9 +59,7 @@ async def login(login_data: LoginRequest, db: AsyncSession = Depends(get_db)):
     Raises:
         HTTPException: If credentials are invalid
     """
-    user = await AuthService.authenticate_user(
-        db, login_data.username, login_data.password
-    )
+    user = await AuthService.authenticate_user(db, login_data.username, login_data.password)
 
     if not user:
         raise HTTPException(

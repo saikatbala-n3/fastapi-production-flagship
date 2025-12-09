@@ -1,25 +1,24 @@
 from typing import Optional
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import (
-    verify_password,
-    get_password_hash,
     create_access_token,
     create_refresh_token,
+    get_password_hash,
+    verify_password,
 )
 from app.models.user import User
-from app.schemas.user import UserCreate
 from app.schemas.token import Token
+from app.schemas.user import UserCreate
 
 
 class AuthService:
     """Authentication service."""
 
     @staticmethod
-    async def authenticate_user(
-        db: AsyncSession, username: str, password: str
-    ) -> Optional[User]:
+    async def authenticate_user(db: AsyncSession, username: str, password: str) -> Optional[User]:
         """
         Authenticate user by username/email and password.
 

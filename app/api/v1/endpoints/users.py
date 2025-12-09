@@ -1,13 +1,14 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.deps import get_current_superuser, get_current_user
+from app.core.cache import CacheManager, get_cache
 from app.core.database import get_db
-from app.core.cache import get_cache, CacheManager
-from app.api.deps import get_current_user, get_current_superuser
+from app.models.user import User
 from app.schemas.user import UserResponse, UserUpdate
 from app.services.user_service import UserService
-from app.models.user import User
 
 router = APIRouter()
 
@@ -26,9 +27,7 @@ async def update_user_me(
     cache: CacheManager = Depends(get_cache),
 ):
     """Update current user profile."""
-    updated_user = await UserService.user_update(
-        db, current_user.id, user_update, cache
-    )
+    updated_user = await UserService.update_user(db, current_user.id, user_update, cache)
     return updated_user
 
 
@@ -43,9 +42,7 @@ async def read_user(
     user = await UserService.get_user_by_id(db, user_id, cache)
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return user
 
 
@@ -78,6 +75,4 @@ async def delete_user(
     deleted = await UserService.delete_user(db, user_id, cache)
 
     if not deleted:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
