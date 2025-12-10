@@ -1,4 +1,7 @@
 import asyncio
+
+# Test database URL (use db hostname for Docker)
+import os
 from typing import AsyncGenerator
 
 import pytest
@@ -9,8 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.core.database import Base, get_db
 from app.main import app
 
-# Test database URL
-TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/test_db"
+TEST_DATABASE_URL = os.getenv(
+    "TEST_DATABASE_URL", "postgresql+asyncpg://postgres:your_secure_password@db:5432/test_db"
+)
 
 # Create test engine
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=True)
@@ -49,14 +53,15 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 
 @pytest_asyncio.fixture(scope="function")
 async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
-    """Create test client with overridden database dependancy."""
+    """Create test client with overridden database dependency."""
+    from httpx import ASGITransport
 
     async def override_get_db():
         yield db_session
 
     app.dependency_overrides[get_db] = override_get_db
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
     app.dependency_overrides.clear()

@@ -5,24 +5,24 @@ from httpx import AsyncClient
 @pytest.mark.asyncio
 async def test_register_user(client: AsyncClient, test_user_data):
     """Test user registration."""
-    reponse = await client.post("/api/v1/auth/register", json=test_user_data)
+    response = await client.post("/api/v1/auth/register", json=test_user_data)
 
-    assert reponse.status_code == 201
-    data = reponse.json()
+    assert response.status_code == 201
+    data = response.json()
     assert data["email"] == test_user_data["email"]
     assert data["username"] == test_user_data["username"]
     assert "id" in data
-    assert "hasshed_password" not in data
+    assert "hashed_password" not in data
 
 
 @pytest.mark.asyncio
 async def test_register_duplicate_email(client: AsyncClient, test_user_data):
     """Test registration with duplicate email."""
     # Register first user
-    await client.post("/ap1/v1/auth/register", json=test_user_data)
+    await client.post("/api/v1/auth/register", json=test_user_data)
 
     # Try to register with same email
-    response = await client.post("/ap1/v1/auth/register", json=test_user_data)
+    response = await client.post("/api/v1/auth/register", json=test_user_data)
 
     assert response.status_code == 400
     assert "Email already registered" in response.json()["detail"]
@@ -30,14 +30,14 @@ async def test_register_duplicate_email(client: AsyncClient, test_user_data):
 
 @pytest.mark.asyncio
 async def test_login(client: AsyncClient, test_user_data):
-    """Test registration with duplicate email."""
+    """Test login with valid credentials."""
     # Register user
-    await client.post("/ap1/v1/auth/register", json=test_user_data)
+    await client.post("/api/v1/auth/register", json=test_user_data)
 
     # Login
     response = await client.post(
-        "/ap1/v1/auth/login",
-        json={test_user_data["username"], test_user_data["password"]},
+        "/api/v1/auth/login",
+        json={"username": test_user_data["username"], "password": test_user_data["password"]},
     )
 
     assert response.status_code == 200

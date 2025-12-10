@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2AuthorizationCodeBearer
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,9 +7,7 @@ from app.core.database import get_db
 from app.core.security import decode_token
 from app.models.user import User, UserRole
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    tokenUrl="/api/v1/auth/login", authorizationUrl="/api/v1/auth/login"
-)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 async def get_current_user(
@@ -83,7 +81,7 @@ def require_role(required_role: UserRole):
     """
 
     async def role_checker(current_user: User = Depends(get_current_user)) -> User:
-        if current_user.role != require_role and not current_user.is_superuser:
+        if current_user.role != required_role and not current_user.is_superuser:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Role {required_role} required",

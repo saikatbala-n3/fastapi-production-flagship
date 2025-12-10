@@ -15,7 +15,7 @@ class CacheManager:
     async def connect(self):
         """Connect to Redis."""
         self.redis = await Redis.from_url(
-            str(settings.REDIS_URL), encoding="utf-8", decode_response=True
+            str(settings.REDIS_URL), encoding="utf-8", decode_responses=True
         )
 
     async def disconnect(self):
@@ -85,5 +85,5 @@ cache = CacheManager()
 
 
 async def get_cache():
-    """Dependancy to get cache instance."""
+    """Dependency to get cache instance."""
     return cache
