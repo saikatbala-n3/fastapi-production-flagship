@@ -31,7 +31,7 @@ async def get(key: str):
     return json.loads(value) if value else None
 
 
-async def set(key: str, value: Any, expire: int = 300) -> bool:
+async def set(key: str, value, expire: int = 300) -> bool:
     if not _redis:
         return False
     return await _redis.setex(key, expire, json.dumps(value, default=str))
