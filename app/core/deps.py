@@ -14,7 +14,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 async def get_current_user(
     token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_session)
 ) -> User:
-    """Validate JWT, check revocation blocklist, fetch user, verify active status."""
     payload = decode_token(token)
     if payload is None:
         raise HTTPException(
@@ -42,8 +41,6 @@ async def get_current_user(
 
 
 def require_role(required_role: UserRole):
-    """Dependency to check if user has required role."""
-
     async def role_checker(current_user: User = Depends(get_current_user)) -> User:
         if current_user.role != required_role:
             raise HTTPException(

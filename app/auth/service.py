@@ -15,12 +15,11 @@ from app.users.schemas import UserCreate
 async def authenticate_user(
     session: AsyncSession, username: str, password: str
 ) -> User | None:
-    """Authenticate user by username/email and password. Returns None on failure"""
     field = User.email if "@" in username else User.username
     result = await session.execute(select(User).where(field == username))
     user = result.scalar_one_or_none()
 
-    if not user or verify_password(password, user.hashed_password):
+    if not user or not verify_password(password, user.hashed_password):
         return None
     return user
 

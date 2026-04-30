@@ -4,7 +4,7 @@ from fastapi import Request, status
 from starlette.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.core.cache import cache
+from app.core import cache
 from app.core.config import settings
 from app.metrics import rate_limit_decisions
 
@@ -16,7 +16,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if request.url.path in EXCLUDED:
             return await call_next(request)
 
-        if not cache.client():
+        if not await cache.client():
             return await call_next(request)
 
         client_ip = request.client.host if request.client else "unknown"
@@ -30,17 +30,17 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             tokens = capacity - 1
         else:
             time_passed = current_time - bucket_data["last_refill"]
-            tokens = min(capacity, int(tokens + time_passed * refill_rate))
+            tokens = min(capacity, int(bucket_data["tokens"] + time_passed * refill_rate))
 
         if tokens < 0:
             rate_limit_decisions.labels(decisions="deny").inc()
-            raise JSONResponse(
+            return JSONResponse(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 content={"detail": "Rate limit exceeded"},
                 headers={"X-RateLimit-Remaining": "0"},
             )
 
-        rate_limit_decisions.labels(decision="allow").inc()
+        rate_limit_decisions.labels(decisions="allow").inc()
         await cache.set(key, {"tokens": tokens, "last_refill": current_time}, expire=60)
 
         response = await call_next(request)

@@ -2,8 +2,8 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    database_url: str = "postgresql+asyncpg://api:api@localhost:5432/production_api"
-    redis_url: str = "redis://localhost:6379/0"
+    database_url: str = "postgresql+asyncpg://api:api@postgres_n3:5432/production_api"
+    redis_url: str = "redis://redis_n3:6379/0"
 
     secret_key: str
     access_token_expire_minutes: int = 30

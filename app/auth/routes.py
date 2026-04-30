@@ -32,7 +32,6 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_session))
 
 @router.post("/login", response_model=Token)
 async def login(login_data: LoginRequest, db: AsyncSession = Depends(get_session)):
-    """Authenticate and return tokens."""
     user = await authenticate_user(db, login_data.username, login_data.password)
     if not user:
         raise HTTPException(
@@ -45,7 +44,6 @@ async def login(login_data: LoginRequest, db: AsyncSession = Depends(get_session
 
 @router.post("/refresh", response_model=Token)
 async def refresh_token(refresh_token: str, db: AsyncSession = Depends(get_session)):
-    """Refresh access token using refresh token."""
     payload = decode_token(refresh_token)
     if payload is None or payload.get("type") != "refresh":
         raise HTTPException(
@@ -65,7 +63,6 @@ async def refresh_token(refresh_token: str, db: AsyncSession = Depends(get_sessi
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(token: str = Depends(oauth2_scheme)):
-    """Revoke the current access token by adding it to the Redis blocklist."""
     payload = decode_token(token)
     if payload:
         remaining = int(payload.get("exp", 0)) - datetime.now(timezone.utc).timestamp()

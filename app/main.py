@@ -6,18 +6,17 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from prometheus_client import make_asgi_app
-from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
-from app.auth.routes import router as auth_router
-from app.core.cache import cache
+from app.core import cache
 from app.core.config import settings
 from app.core.database import Base, engine
-from app.metrics import http_duration, http_requests
-from app.middleware.correlation_id import CorrelationIdMiddleware
-from app.middleware.rate_limit import RateLimitMiddleware
 from app.users.models import User
 from app.users.routes import router as user_router
+from app.auth.routes import router as auth_router
+from app.metrics import http_duration, http_requests
+from app.middleware.rate_limit import RateLimitMiddleware
+from app.middleware.correlation_id import CorrelationIdMiddleware
 
 # Configure logging
 logging.basicConfig(
